@@ -1,8 +1,8 @@
 # Fire Station Location Covering Optimization
 
-This repository presents a mixed-integer programming model for selecting fire station locations under response-time, redundancy, budget, and aggregate capacity requirements.
+This repository presents a mixed-integer programming model for selecting fire station locations under response-time, redundancy, and budget requirements.
 
-The example is intentionally fictional. All place names, costs, capacities, demands, and travel times were created for educational and research use.
+The example is intentionally fictional. All place names, costs, and travel times were created for educational and non-commercial research use.
 
 ## Problem
 
@@ -14,7 +14,6 @@ The model includes the following requirements:
 - Ensure every city is covered within the maximum response time.
 - Require double coverage for selected high-priority cities.
 - Respect a total construction budget.
-- Ensure the aggregate capacity of selected stations is sufficient for total regional demand.
 
 The decision variable is binary:
 
@@ -60,15 +59,14 @@ The script reports:
 - solver status,
 - selected fire station locations,
 - total construction cost,
-- total selected capacity,
-- total regional demand,
+- budget limit,
 - coverage verification for every city.
 
 ## Model Notes
 
-This model is a set-covering style facility-location formulation with additional side constraints. It is designed as a compact operations research example rather than as a production emergency-services planning system.
+This model is a set-covering style facility-location formulation with additional redundancy and budget constraints. It is designed as a compact operations research example rather than as a production emergency-services planning system.
 
-The aggregate capacity constraint is intentionally simplified. It verifies that total installed capacity is sufficient for total regional demand, but it does not assign individual demand points to specific fire stations. A more advanced formulation could introduce assignment variables, station-specific workload constraints, scenario-based response times, or stochastic demand.
+For the current data set, the model has a feasible solution and minimizes construction cost while satisfying all coverage requirements. A more advanced formulation could introduce explicit demand assignment, station capacities, workload balancing, stochastic response times, or scenario-based resilience constraints.
 
 ## License
 
