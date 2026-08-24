@@ -1,8 +1,8 @@
 """Fire station location covering optimization using PuLP.
 
-This educational example formulates a capacitated set-covering style facility
-location problem for emergency response planning. All names and data are
-fictional and are provided solely for demonstration and research purposes.
+This educational example formulates a set-covering style facility location
+problem for emergency response planning. All names and data are fictional and
+provided solely for demonstration, education, and non-commercial research.
 """
 
 from __future__ import annotations
@@ -17,24 +17,22 @@ import pulp
 class CityData:
     name: str
     construction_cost: int
-    station_capacity: int
-    demand: int
     required_coverage: int
 
 
 CITIES: List[CityData] = [
-    CityData("Northfield", 32, 85, 42, 1),
-    CityData("Eastport", 27, 70, 38, 1),
-    CityData("Riverton", 35, 90, 55, 2),
-    CityData("Hillcrest", 30, 75, 41, 1),
-    CityData("Lakeside", 29, 80, 48, 2),
-    CityData("Westhaven", 31, 78, 44, 1),
-    CityData("Brookdale", 26, 68, 36, 1),
-    CityData("Southgate", 34, 88, 52, 1),
+    CityData("Northfield", 32, 1),
+    CityData("Eastport", 27, 1),
+    CityData("Riverton", 35, 2),
+    CityData("Hillcrest", 30, 1),
+    CityData("Lakeside", 29, 2),
+    CityData("Westhaven", 31, 1),
+    CityData("Brookdale", 26, 1),
+    CityData("Southgate", 34, 1),
 ]
 
 MAX_RESPONSE_TIME = 15
-TOTAL_BUDGET = 125
+TOTAL_BUDGET = 130
 
 # Symmetric fictional travel-time matrix in minutes.
 TRAVEL_TIME = [
@@ -64,31 +62,24 @@ def solve_model() -> tuple[pulp.LpProblem, Dict[int, pulp.LpVariable]]:
     model = pulp.LpProblem("Fire_Station_Location_Covering", pulp.LpMinimize)
 
     x = {
-        i: pulp.LpVariable(f"station_{i}", lowBound=0, upBound=1, cat="Binary")
+        i: pulp.LpVariable(f"station_{i}", cat="Binary")
         for i in range(len(CITIES))
     }
 
-    # Primary objective: minimize total construction cost.
+    # Minimize total construction cost.
     model += pulp.lpSum(CITIES[i].construction_cost * x[i] for i in x)
 
-    # Coverage requirements. High-priority cities require two independent stations.
+    # Every city must receive the required number of independent covering stations.
     for i, city in enumerate(CITIES):
         model += (
             pulp.lpSum(x[j] for j in coverage_sets[i]) >= city.required_coverage,
             f"coverage_{i}",
         )
 
-    # Total budget ceiling.
+    # Planning budget ceiling.
     model += (
         pulp.lpSum(CITIES[i].construction_cost * x[i] for i in x) <= TOTAL_BUDGET,
         "budget_limit",
-    )
-
-    # Aggregate capacity requirement: selected stations must support total demand.
-    model += (
-        pulp.lpSum(CITIES[i].station_capacity * x[i] for i in x)
-        >= pulp.lpSum(city.demand for city in CITIES),
-        "aggregate_capacity",
     )
 
     solver = pulp.PULP_CBC_CMD(msg=False)
@@ -98,19 +89,14 @@ def solve_model() -> tuple[pulp.LpProblem, Dict[int, pulp.LpVariable]]:
 
 
 def verify_solution(x: Dict[int, pulp.LpVariable]) -> None:
-    """Validate coverage and capacity for the chosen solution."""
+    """Validate all coverage requirements for the selected locations."""
     coverage_sets = build_coverage_sets()
-    chosen = {i for i in x if pulp.value(x[i]) > 0.5}
+    selected = {i for i in x if pulp.value(x[i]) > 0.5}
 
     for i, city in enumerate(CITIES):
-        covered_by = [j for j in coverage_sets[i] if j in chosen]
-        if len(covered_by) < city.required_coverage:
+        providers = [j for j in coverage_sets[i] if j in selected]
+        if len(providers) < city.required_coverage:
             raise RuntimeError(f"Coverage verification failed for {city.name}.")
-
-    total_capacity = sum(CITIES[i].station_capacity for i in chosen)
-    total_demand = sum(city.demand for city in CITIES)
-    if total_capacity < total_demand:
-        raise RuntimeError("Capacity verification failed.")
 
 
 def print_solution(model: pulp.LpProblem, x: Dict[int, pulp.LpVariable]) -> None:
@@ -125,21 +111,14 @@ def print_solution(model: pulp.LpProblem, x: Dict[int, pulp.LpVariable]) -> None
 
     selected = [i for i in x if pulp.value(x[i]) > 0.5]
     total_cost = sum(CITIES[i].construction_cost for i in selected)
-    total_capacity = sum(CITIES[i].station_capacity for i in selected)
-    total_demand = sum(city.demand for city in CITIES)
 
     print("\nSelected fire station locations:")
     for i in selected:
         city = CITIES[i]
-        print(
-            f"- {city.name}: cost={city.construction_cost}, "
-            f"capacity={city.station_capacity}"
-        )
+        print(f"- {city.name}: construction cost={city.construction_cost}")
 
     print(f"\nTotal construction cost: {total_cost}")
     print(f"Budget limit: {TOTAL_BUDGET}")
-    print(f"Total selected capacity: {total_capacity}")
-    print(f"Total regional demand: {total_demand}")
 
     print("\nCoverage verification:")
     coverage_sets = build_coverage_sets()
