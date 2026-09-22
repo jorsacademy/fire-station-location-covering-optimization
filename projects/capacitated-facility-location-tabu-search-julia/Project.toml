@@ -1,0 +1,13 @@
+name = "CapacitatedFacilityLocationTabuSearch"
+uuid = "1ba48451-fb27-4764-a222-dcd7e94426ba"
+authors = ["jorsacademy"]
+version = "0.1.0"
+
+[compat]
+julia = "1.10"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
