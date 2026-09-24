@@ -1,4 +1,22 @@
-# Fire Station Location Covering Optimization
+# Location and Spatial Optimization
+
+<!-- portfolio-umbrella:start -->
+## Portfolio role
+
+This repository is the primary umbrella repository for this Jors Academy research area. Related projects have been consolidated under `projects/` so the methods, implementations, experiments, and case studies can be maintained and explored from one place.
+
+### Included projects
+
+- [`capacitated-facility-location-tabu-search-julia`](projects/capacitated-facility-location-tabu-search-julia/)
+- [`fire-station-location-optimization-pulp`](projects/fire-station-location-optimization-pulp/)
+- [`school-districting-optimization-gurobi`](projects/school-districting-optimization-gurobi/)
+- [`school-redistricting-optimization-gurobi`](projects/school-redistricting-optimization-gurobi/)
+- [`urban-parking-recommendation-milp`](projects/urban-parking-recommendation-milp/)
+- [`wind-farm-layout-optimization`](projects/wind-farm-layout-optimization/)
+- [`wind-farm-layout-optimizer`](projects/wind-farm-layout-optimizer/)
+
+Each consolidated project keeps its own files and a `SOURCE_REPOSITORY.md` provenance record. The snapshot preserves the source repository's default-branch files at consolidation time; repository-level history and metadata remain separate from the snapshot.
+<!-- portfolio-umbrella:end -->
 
 This repository presents a mixed-integer programming model for selecting fire station locations under response-time, redundancy, and budget requirements.
 
